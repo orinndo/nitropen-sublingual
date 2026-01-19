@@ -5,100 +5,109 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ニトロペン舌下投与 音声ガイド</title>
 <style>
-body{font-family:system-ui,-apple-system,"Hiragino Sans",sans-serif;margin:18px;line-height:1.45;}
-h1{font-size:26px;margin:0 0 8px 0;}
-.note{font-size:12px;color:#666;margin:0 0 16px 0;}
-.panel{border:1px solid #e6e6e6;border-radius:14px;padding:14px;max-width:980px;}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Segoe UI",sans-serif;
+background:linear-gradient(180deg,#f7fbff,#eef6ff);color:#0f172a;}
+.header{padding:18px 16px 10px;}
+.frame-title{border:2px solid #38bdf8;padding:14px 16px;border-radius:14px;background:#f8fcff;text-align:center;}
+.frame-title h1{margin:0;font-size:20px;}
+.frame-title p{margin:6px 0 0;font-size:14px;color:#475569;}
+.note{font-size:12px;color:#475569;margin:12px 16px;}
+.main{margin:0 16px 24px;padding:16px;background:#fff;border-radius:18px;box-shadow:0 8px 18px rgba(15,23,42,.08);}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-.tag{display:inline-block;font-size:12px;color:#666;background:#f5f5f5;border:1px solid #e6e6e6;border-radius:999px;padding:4px 10px;}
-select{font-size:16px;padding:10px 12px;min-width:320px;flex:1;border-radius:10px;border:1px solid #dcdcdc;}
-.navbtn{font-size:16px;padding:10px 14px;border:1px solid #dcdcdc;background:#fff;border-radius:10px;min-width:70px;}
-.navbtn:disabled{opacity:.35;}
-.label{font-size:12px;color:#666;margin-top:14px;}
-.jp{font-size:22px;font-weight:800;margin:6px 0 14px 0;}
-.en{font-size:18px;margin:6px 0 0 0;}
-.controls{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 8px 0;}
-.btn{font-size:16px;padding:10px 14px;border:1px solid #dcdcdc;background:#fff;border-radius:12px;min-width:150px;}
-.status{font-size:12px;color:#666;margin:6px 0 6px 0;}
-audio{width:100%;margin-top:6px;}
-.hint{font-size:12px;color:#666;margin-top:8px;}
+select{flex:1;max-width:100%;font-size:16px;padding:10px 36px 10px 12px;border-radius:12px;border:1px solid #cbd5f5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+button{font-size:15px;padding:10px 14px;border-radius:12px;border:1px solid #cbd5f5;background:#eff6ff;}
+button:active{transform:scale(.98);}
+.label{margin-top:14px;font-size:13px;color:#475569;}
+.jp{font-size:18px;font-weight:600;margin-top:6px;}
+.en{font-size:16px;margin-top:4px;}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+audio{width:100%;margin-top:10px;}
+.status{margin-top:8px;font-size:13px;color:#475569;}
+.hint{margin-top:10px;font-size:12px;color:#64748b;}
 </style>
 </head>
 <body>
-<h1>ニトロペン舌下投与 音声ガイド</h1>
-<p class="note">※ 必ず GitHub Pages のURLで開いてください。iPhoneでは自動再生できないため、下の再生ボタンを押してください。</p>
-<div class="panel">
+<div class="header">
+  <div class="frame-title">
+    <h1>ニトロペン舌下投与</h1>
+    <p>English Audio Guide</p>
+  </div>
+</div>
+
+<p class="note">※ iPhone / iPad / Android で再生できます。最初は「再生」を押してください。</p>
+
+<div class="main">
   <div class="row">
-    <span class="tag">ステップ選択</span>
-    <select id="stepSelect"><option value="01">01. これからニトロペン（ニトログリセリン）という、心臓の血管を広げるお薬を舌の下に入れますね。</option>
-<option value="02">02. これは舌下錠なので、飲み込まないでください。</option>
-<option value="03">03. うまく溶けない場合は、飴のように軽く舐めて溶かしてもかまいませんが、噛んだり砕いたりしないでください。</option>
-<option value="04">04. この薬は脳の血管も広げるため、軽い頭痛を感じることがありますが、心配いりません。</option>
-<option value="05">05. たいていの方は軽い頭痛だけですが、もし頭痛がひどくなったと感じたら、すぐに教えてください。</option>
-<option value="06">06. 口を開けて舌を上げてください。</option>
-<option value="07">07. 飲み込まないでください。</option>
-<option value="08">08. 飴のように舐めて溶かしてくださいね。</option>
-<option value="09">09. お薬が溶けたら教えてください。</option>
-<option value="10">10. お薬はもう溶けましたか？ まだ舌の下に残っていますか？</option></select>
-    <button class="navbtn" id="prevBtn">← 前</button>
-    <button class="navbtn" id="nextBtn">次 →</button>
+    <select id="sel"></select>
+    <button id="prev">← 前</button>
+    <button id="next">次 →</button>
   </div>
 
   <div class="label">日本語（内容）</div>
-  <div class="jp" id="jpText"></div>
+  <div class="jp" id="jp"></div>
 
   <div class="label">English (Script)</div>
-  <div class="en" id="enText"></div>
+  <div class="en" id="en"></div>
 
   <div class="controls">
-    <button class="btn" id="playBtn">▶︎ 再生 / Play</button>
-    <button class="btn" id="pauseBtn">⏸ 一時停止 / Pause</button>
-    <button class="btn" id="replayBtn">↻ もう一度 / Replay</button>
+    <button id="play">▶︎ 再生</button>
+    <button id="pause">⏸ 一時停止</button>
+    <button id="replay">↻ もう一度</button>
   </div>
 
   <div class="status" id="status">待機中 / Ready</div>
-  <audio id="player" controls playsinline preload="none"></audio>
-  <div class="hint">再生できない場合は、消音モード・音量・Bluetooth接続をご確認ください。</div>
+  <audio id="player" controls></audio>
+
+  <div class="hint">
+    再生できない場合：消音モード解除、音量、Bluetooth接続を確認してください。
+  </div>
 </div>
 
 <script>
-const STEPS=[{"id": "01", "jp": "これからニトロペン（ニトログリセリン）という、心臓の血管を広げるお薬を舌の下に入れますね。", "en": "We're going to put a medicine under your tongue. It helps widen the blood vessels in your heart.", "audio": "audio/step_01.m4a"}, {"id": "02", "jp": "これは舌下錠なので、飲み込まないでください。", "en": "This is a sublingual tablet that dissolves under your tongue, so please don't swallow it.", "audio": "audio/step_02.m4a"}, {"id": "03", "jp": "うまく溶けない場合は、飴のように軽く舐めて溶かしてもかまいませんが、噛んだり砕いたりしないでください。", "en": "If it's hard to dissolve, you can lick it like a candy to help it dissolved, but please don't chew or bite it.", "audio": "audio/step_03.m4a"}, {"id": "04", "jp": "この薬は脳の血管も広げるため、軽い頭痛を感じることがありますが、心配いりません。", "en": "This medicine can also widen the blood vessels in your brain, so you may feel a light headache, but it's nothing to worry about.", "audio": "audio/step_04.m4a"}, {"id": "05", "jp": "たいていの方は軽い頭痛だけですが、もし頭痛がひどくなったと感じたら、すぐに教えてください。", "en": "Most patients feel just a mild headache, but if you feel the headache is getting worse, please tell us right away.", "audio": "audio/step_05.m4a"}, {"id": "06", "jp": "口を開けて舌を上げてください。", "en": "Please open your mouth and lift your tongue.", "audio": "audio/step_06.m4a"}, {"id": "07", "jp": "飲み込まないでください。", "en": "Please don't swallow the tablet.", "audio": "audio/step_07.m4a"}, {"id": "08", "jp": "飴のように舐めて溶かしてくださいね。", "en": "Let it dissolve like a candy on your tongue.", "audio": "audio/step_08.m4a"}, {"id": "09", "jp": "お薬が溶けたら教えてください。", "en": "Please let me know when the medicine has dissolved.", "audio": "audio/step_09.m4a"}, {"id": "10", "jp": "お薬はもう溶けましたか？ まだ舌の下に残っていますか？", "en": "Has it dissolved? Is it still there under your tongue?", "audio": "audio/step_10.m4a"}];
-const sel=document.getElementById('stepSelect');
-const jpEl=document.getElementById('jpText');
-const enEl=document.getElementById('enText');
-const player=document.getElementById('player');
-const statusEl=document.getElementById('status');
-const prevBtn=document.getElementById('prevBtn');
-const nextBtn=document.getElementById('nextBtn');
+const STEPS = [
+ {preview:"舌の下にお薬を入れます…", jp:"これからお薬を舌の下に入れます。心臓の血管を広げるお薬です。", en:"We’re going to put a medicine under your tongue. It helps widen the blood vessels in your heart."},
+ {preview:"舌下錠の説明…", jp:"これは舌下錠です。舌の下で溶けるので、飲み込まないでください。", en:"This is a sublingual tablet that dissolves under your tongue, so please don’t swallow it."},
+ {preview:"溶けにくい場合…", jp:"溶けにくい場合は、飴のようになめても構いませんが、噛まないでください。", en:"If it’s hard to dissolve, you can lick it like a candy to help it dissolved, but please don’t chew or bite it."},
+ {preview:"頭痛について…", jp:"このお薬は脳の血管も広げるため、軽い頭痛を感じることがありますが、心配いりません。", en:"This medicine can also widen the blood vessels in your brain, so you may feel a light headache, but it’s nothing to worry about."},
+ {preview:"頭痛が強い場合…", jp:"多くの方は軽い頭痛ですが、強くなった場合はすぐにお知らせください。", en:"Most patients feel just a mild headache, but if you feel the headache is getting worse, please tell us right away."},
+ {preview:"舌を上げて…", jp:"お口を開けて、舌を上げてください。", en:"Please open your mouth and lift your tongue."},
+ {preview:"飲み込まないで…", jp:"錠剤は飲み込まないでください。", en:"Please don’t swallow the tablet."},
+ {preview:"舌の上で溶かす…", jp:"飴のように舌の上で溶かしてください。", en:"Let it dissolve like a candy on your tongue."},
+ {preview:"溶けたら教えて…", jp:"お薬が溶けたら教えてください。", en:"Please let me know when the medicine has dissolved."},
+ {preview:"溶けましたか？…", jp:"溶けましたか？まだ舌の下にありますか？", en:"Has it dissolved? Is it still there under your tongue?"}
+];
 
-function setStatus(s){statusEl.textContent=s;}
-function idx(){return STEPS.findIndex(s=>s.id===sel.value);}
+const sel=document.getElementById('sel'),
+jp=document.getElementById('jp'),
+en=document.getElementById('en'),
+player=document.getElementById('player'),
+status=document.getElementById('status');
 
+STEPS.forEach((s,i)=>{
+ const o=document.createElement('option');
+ o.value=i;
+ o.textContent=`${String(i+1).padStart(2,'0')}｜${s.jp}`;
+ sel.appendChild(o);
+});
+
+let idx=0;
 function load(i){
-  if(i<0)i=0;if(i>=STEPS.length)i=STEPS.length-1;
-  const s=STEPS[i];
-  sel.value=s.id;
-  jpEl.textContent=s.jp||"";
-  enEl.textContent=s.en||"";
-  player.src=s.audio;
-  player.currentTime=0;
-  setStatus("待機中 / Ready");
-  prevBtn.disabled=(i===0);
-  nextBtn.disabled=(i===STEPS.length-1);
+ idx=Math.max(0,Math.min(STEPS.length-1,i));
+ sel.value=idx;
+ jp.textContent=STEPS[idx].jp;
+ en.textContent=STEPS[idx].en;
+ player.src=`audio/step_${String(idx+1).padStart(2,'0')}.m4a`;
+ status.textContent="待機中 / Ready";
 }
-
-sel.addEventListener('change',()=>load(idx()));
-prevBtn.onclick=()=>load(idx()-1);
-nextBtn.onclick=()=>load(idx()+1);
-
-document.getElementById('playBtn').onclick=async()=>{try{await player.play();}catch(e){alert("再生できませんでした。");}};
-document.getElementById('pauseBtn').onclick=()=>player.pause();
-document.getElementById('replayBtn').onclick=async()=>{player.currentTime=0;try{await player.play();}catch(e){}};
-
-player.onplay=()=>setStatus("再生中 / Playing");
-player.onpause=()=>setStatus("一時停止 / Paused");
-player.onended=()=>setStatus("待機中 / Ready");
-
+sel.onchange=()=>load(parseInt(sel.value));
+document.getElementById('prev').onclick=()=>load(idx-1);
+document.getElementById('next').onclick=()=>load(idx+1);
+document.getElementById('play').onclick=()=>player.play();
+document.getElementById('pause').onclick=()=>player.pause();
+document.getElementById('replay').onclick=()=>{player.currentTime=0;player.play();}
+player.onplay=()=>status.textContent="再生中 / Playing";
+player.onpause=()=>status.textContent="一時停止 / Paused";
+player.onended=()=>status.textContent="待機中 / Ready";
 load(0);
 </script>
 </body>
