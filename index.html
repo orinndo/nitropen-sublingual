@@ -25,17 +25,6 @@ audio{width:100%;margin-top:10px;}
 .status{margin-top:8px;font-size:13px;color:#475569;}
 .hint{margin-top:10px;font-size:12px;color:#64748b;}
 
-.img-btn{margin-top:12px;width:100%;font-weight:700;background:#f8fcff;border:2px solid #38bdf8;}
-.img-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20000;display:none;}
-.img-modal{position:fixed;inset:0;z-index:20001;display:none;align-items:center;justify-content:center;padding:14px;}
-.img-card{width:min(980px,100%);height:min(90vh,100%);background:#fff;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 40px rgba(15,23,42,.35);}
-.img-card-header{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;}
-.img-card-title{font-weight:800;}
-.img-close{background:#eff6ff;border:1px solid #cbd5f5;border-radius:12px;padding:8px 12px;font-size:14px;}
-.img-view{flex:1;display:flex;align-items:center;justify-content:center;background:#0b1220;}
-.img-view img{max-width:100%;max-height:100%;object-fit:contain;}
-
-
 /* === Shared sheet styles (same as implant device) === */
 .fab-dev{position:fixed;left:16px;bottom:16px;z-index:10000;
 background:#f8fcff;border:2px solid #38bdf8;color:#0f172a;
@@ -94,12 +83,7 @@ border-radius:20px;padding:12px 12px 14px;box-shadow:0 18px 40px rgba(15,23,42,.
     <button id="pause">⏸ 一時停止</button>
     <button id="replay">↻ もう一度</button>
   </div>
-
-  <div class="controls" style="margin-top:12px;">
-    <button class="img-btn" id="openNitroImage" type="button">🖼 ニトロペン投与イメージ図</button>
-  </div>
-
-  <div class="status" id="status">待機中 / Ready</div>
+<div class="status" id="status">待機中 / Ready</div>
   <audio id="player" controls></audio>
 
   <div class="hint">
@@ -156,30 +140,6 @@ player.onended=()=>status.textContent="待機中 / Ready";
 load(0);
 
 
-// Nitro image sheet (same behavior as implant device)
-const nitroImgFab = document.getElementById('nitroImgFab');
-const nitroImgBackdrop = document.getElementById('nitroImgBackdrop');
-const nitroImgSheet = document.getElementById('nitroImgSheet');
-const nitroImgClose = document.getElementById('nitroImgClose');
-
-function showNitroImg(){
-  if(!nitroImgBackdrop || !nitroImgSheet) return;
-  nitroImgBackdrop.style.display='block';
-  nitroImgSheet.style.display='block';
-  if(nitroImgFab) nitroImgFab.style.display='none';
-}
-function hideNitroImg(){
-  if(!nitroImgBackdrop || !nitroImgSheet) return;
-  nitroImgBackdrop.style.display='none';
-  nitroImgSheet.style.display='none';
-  if(nitroImgFab) nitroImgFab.style.display='';
-}
-
-if(nitroImgFab) nitroImgFab.addEventListener('click', showNitroImg);
-if(nitroImgClose) nitroImgClose.addEventListener('click', hideNitroImg);
-if(nitroImgBackdrop) nitroImgBackdrop.addEventListener('click', hideNitroImg);
-document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') hideNitroImg(); });
-
 </script>
 
 <button class="img-close" id="closeNitroImage" type="button">閉じる</button>
@@ -190,20 +150,29 @@ document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') hideNitroImg(); 
   </div>
 </div>
 
-<button class="fab-dev" id="nitroImgFab">ニトロペン投与イメージ図</button>
-
-<div class="dev-backdrop" id="nitroImgBackdrop"></div>
-<div class="dev-sheet" id="nitroImgSheet" role="dialog" aria-modal="true" aria-label="nitro image">
-  <div class="dev-panel">
-    <div class="dev-title">ニトロペン投与イメージ図</div>
-
-    <div style="padding:6px;">
+<div style="padding:6px;">
       <img class="nitro-img" src="img/nitropen_image.jpg" alt="ニトロペン投与イメージ図">
     </div>
 
     <div class="dev-footer">
       <button class="dev-close" id="nitroImgClose" type="button">閉じる</button>
       <div style="font-size:12px;color:#64748b;">タップして確認できます</div>
+    </div>
+  </div>
+</div>
+
+
+<button class="fab-dev" id="nitroImgFab" type="button">ニトロペン投与イメージ図</button>
+<div class="dev-backdrop" id="nitroSheetBackdrop" style="display:none;"></div>
+<div class="dev-sheet" id="nitroSheet" role="dialog" aria-modal="true" aria-label="nitro image" style="display:none;">
+  <div class="dev-panel">
+    <div class="dev-title">ニトロペン投与イメージ図</div>
+    <div style="padding:6px;">
+      <img class="nitro-img" src="img/nitropen_image.jpg" alt="ニトロペン投与イメージ図">
+    </div>
+    <div class="dev-footer">
+      <button class="dev-close" id="nitroSheetClose" type="button">閉じる</button>
+      <div style="font-size:12px;color:#64748b;">舌の下に入れます</div>
     </div>
   </div>
 </div>
