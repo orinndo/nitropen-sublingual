@@ -30,9 +30,9 @@ audio{width:100%;margin-top:10px;}
 background:#f8fcff;border:2px solid #38bdf8;color:#0f172a;
 border-radius:14px;padding:12px 14px;font-weight:800}
 .dev-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);
-z-index:9998;display:none}
+z-index:9998;display:block}
 .dev-sheet{position:fixed;left:0;right:0;bottom:0;z-index:9999;
-display:none;padding:12px 12px 18px}
+display:block;padding:12px 12px 18px}
 .dev-panel{max-width:860px;margin:0 auto;background:#fff;
 border-radius:20px;padding:12px 12px 14px;box-shadow:0 18px 40px rgba(15,23,42,.25)}
 .dev-list{display:flex;flex-direction:column;gap:10px;max-height:52vh;overflow:auto;padding:4px}
@@ -142,40 +142,52 @@ load(0);
 
 </script>
 
-<button class="img-close" id="closeNitroImage" type="button">閉じる</button>
-    </div>
-    <div class="img-view">
-      <img src="img/nitropen_image.jpg" alt="ニトロペン投与イメージ図">
-    </div>
-  </div>
-</div>
-
-<div style="padding:6px;">
-      <img class="nitro-img" src="img/nitropen_image.jpg" alt="ニトロペン投与イメージ図">
-    </div>
-
-    <div class="dev-footer">
-      <button class="dev-close" id="nitroImgClose" type="button">閉じる</button>
-      <div style="font-size:12px;color:#64748b;">タップして確認できます</div>
-    </div>
-  </div>
-</div>
-
-
-<button class="fab-dev" id="nitroImgFab" type="button">ニトロペン投与イメージ図</button>
-<div class="dev-backdrop" id="nitroSheetBackdrop" style="display:none;"></div>
-<div class="dev-sheet" id="nitroSheet" role="dialog" aria-modal="true" aria-label="nitro image" style="display:none;">
+<!-- Nitro image sheet (opens only when user taps the button) -->
+<button class="fab-dev" id="nitroImgFab" type="button" aria-label="Nitropen image">投与イメージ</button>
+<div class="dev-backdrop" id="nitroSheetBackdrop" hidden></div>
+<div class="dev-sheet" id="nitroSheet" role="dialog" aria-modal="true" aria-label="nitro image" hidden>
   <div class="dev-panel">
-    <div class="dev-title">ニトロペン投与イメージ図</div>
     <div style="padding:6px;">
       <img class="nitro-img" src="img/nitropen_image.jpg" alt="ニトロペン投与イメージ図">
     </div>
     <div class="dev-footer">
       <button class="dev-close" id="nitroSheetClose" type="button">閉じる</button>
-      <div style="font-size:12px;color:#64748b;">舌の下に入れます</div>
+      <div style="font-size:12px;color:#64748b;">タップで拡大できます</div>
     </div>
   </div>
 </div>
+
+<script>
+// --- Nitro image sheet controls ---
+(function(){
+  const fab = document.getElementById('nitroImgFab');
+  const sheet = document.getElementById('nitroSheet');
+  const backdrop = document.getElementById('nitroSheetBackdrop');
+  const closeBtn = document.getElementById('nitroSheetClose');
+
+  if (!fab || !sheet || !backdrop || !closeBtn) return;
+
+  function openSheet(){
+    sheet.hidden = false;
+    backdrop.hidden = false;
+    // prevent background scroll
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSheet(){
+    sheet.hidden = true;
+    backdrop.hidden = true;
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+  }
+
+  fab.addEventListener('click', openSheet);
+  closeBtn.addEventListener('click', closeSheet);
+  backdrop.addEventListener('click', closeSheet);
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeSheet(); });
+})();
+</script>
 
 </body>
 </html>
