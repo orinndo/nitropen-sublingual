@@ -24,6 +24,18 @@ button:active{transform:scale(.98);}
 audio{width:100%;margin-top:10px;}
 .status{margin-top:8px;font-size:13px;color:#475569;}
 .hint{margin-top:10px;font-size:12px;color:#64748b;}
+
+/* Fullscreen image modal */
+.img-btn{margin-top:12px;width:100%;font-weight:700;background:#f8fcff;border:2px solid #38bdf8;}
+.img-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20000;display:none;}
+.img-modal{position:fixed;inset:0;z-index:20001;display:none;align-items:center;justify-content:center;padding:14px;}
+.img-card{width:min(980px,100%);height:min(90vh,100%);background:#fff;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 40px rgba(15,23,42,.35);}
+.img-card-header{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;}
+.img-card-title{font-weight:800;}
+.img-close{background:#eff6ff;border:1px solid #cbd5f5;border-radius:12px;padding:8px 12px;font-size:14px;}
+.img-view{flex:1;display:flex;align-items:center;justify-content:center;background:#0b1220;}
+.img-view img{max-width:100%;max-height:100%;object-fit:contain;}
+
 </style>
 </head>
 <body>
@@ -53,6 +65,10 @@ audio{width:100%;margin-top:10px;}
     <button id="play">▶︎ 再生</button>
     <button id="pause">⏸ 一時停止</button>
     <button id="replay">↻ もう一度</button>
+  </div>
+
+  <div class="controls" style="margin-top:12px;">
+    <button class="img-btn" id="openNitroImage" type="button">🖼 ニトロペン投与イメージ図</button>
   </div>
 
   <div class="status" id="status">待機中 / Ready</div>
@@ -108,7 +124,45 @@ document.getElementById('replay').onclick=()=>{player.currentTime=0;player.play(
 player.onplay=()=>status.textContent="再生中 / Playing";
 player.onpause=()=>status.textContent="一時停止 / Paused";
 player.onended=()=>status.textContent="待機中 / Ready";
+
+// Nitro image modal
+const openNitroImageBtn = document.getElementById('openNitroImage');
+const nitroImgBackdrop = document.getElementById('nitroImgBackdrop');
+const nitroImgModal = document.getElementById('nitroImgModal');
+const closeNitroImageBtn = document.getElementById('closeNitroImage');
+
+function openNitroImage(){
+  if(!nitroImgBackdrop || !nitroImgModal) return;
+  nitroImgBackdrop.style.display='block';
+  nitroImgModal.style.display='flex';
+}
+function closeNitroImage(){
+  if(!nitroImgBackdrop || !nitroImgModal) return;
+  nitroImgBackdrop.style.display='none';
+  nitroImgModal.style.display='none';
+}
+
+if(openNitroImageBtn) openNitroImageBtn.addEventListener('click', openNitroImage);
+if(closeNitroImageBtn) closeNitroImageBtn.addEventListener('click', closeNitroImage);
+if(nitroImgBackdrop) nitroImgBackdrop.addEventListener('click', closeNitroImage);
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeNitroImage(); });
+
+
 load(0);
 </script>
+
+<div class="img-backdrop" id="nitroImgBackdrop"></div>
+<div class="img-modal" id="nitroImgModal" role="dialog" aria-modal="true" aria-label="nitropen image">
+  <div class="img-card">
+    <div class="img-card-header">
+      <div class="img-card-title">ニトロペン投与イメージ図</div>
+      <button class="img-close" id="closeNitroImage" type="button">閉じる</button>
+    </div>
+    <div class="img-view">
+      <img src="img/nitropen_image.jpg" alt="ニトロペン投与イメージ図">
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
