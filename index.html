@@ -53,6 +53,36 @@ border-radius:20px;padding:12px 12px 14px;box-shadow:0 18px 40px rgba(15,23,42,.
   background:#0b1220;
 }
 
+
+/* Ensure hidden attribute always hides (Safari/bfcache safety) */
+.dev-sheet[hidden], .dev-backdrop[hidden]{display:none !important;}
+
+/* Backdrop */
+.dev-backdrop{
+  position:fixed; inset:0;
+  background:rgba(15,23,42,.35);
+  z-index:9998;
+}
+
+/* Sheet */
+.dev-sheet{
+  background:rgba(255,255,255,.0);
+}
+
+/* Panel */
+.dev-panel{
+  max-width:920px;
+  margin:0 auto;
+}
+
+/* Close button pinned (always visible) */
+.dev-close{
+  position:absolute;
+  top:10px;
+  left:10px;
+  z-index:10000;
+}
+.dev-panel{position:relative;}
 </style>
 </head>
 <body>
@@ -143,7 +173,7 @@ load(0);
 </script>
 
 <!-- Nitro image sheet (opens only when user taps the button) -->
-<button class="fab-dev" id="nitroImgFab" type="button" aria-label="Nitropen image">投与イメージ</button>
+<button class="fab-dev" id="nitroImgFab" type="button" aria-label="Nitropen image">🖼</button>
 <div class="dev-backdrop" id="nitroSheetBackdrop" hidden></div>
 <div class="dev-sheet" id="nitroSheet" role="dialog" aria-modal="true" aria-label="nitro image" hidden>
   <div class="dev-panel">
@@ -167,6 +197,8 @@ load(0);
 
   if (!fab || !sheet || !backdrop || !closeBtn) return;
 
+  closeSheet();
+
   function openSheet(){
     sheet.hidden = false;
     backdrop.hidden = false;
@@ -181,6 +213,9 @@ load(0);
     document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
   }
+
+  // Always start closed (handles Safari bfcache / reload restoring open state)
+  window.addEventListener('pageshow', () => closeSheet());
 
   fab.addEventListener('click', openSheet);
   closeBtn.addEventListener('click', closeSheet);
