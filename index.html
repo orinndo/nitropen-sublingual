@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>患者入室（Patient Entry）音声ガイド</title>
+<title>ニトロペン舌下投与 音声ガイド</title>
 <style>
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Segoe UI",sans-serif;
 background:linear-gradient(180deg,#f7fbff,#eef6ff);color:#0f172a;}
@@ -25,16 +25,18 @@ audio{width:100%;margin-top:10px;}
 .status{margin-top:8px;font-size:13px;color:#475569;}
 .hint{margin-top:10px;font-size:12px;color:#64748b;}
 
-.device-details{margin-top:10px;border:1px solid #cbd5f5;border-radius:14px;background:#f8fcff;padding:10px 12px;}
-.device-summary{cursor:pointer;font-size:14px;color:#0f172a;list-style:none;}
-.device-summary::-webkit-details-marker{display:none;}
-.device-list{display:flex;flex-direction:column;gap:10px;margin-top:10px;}
-.device-btn{font-size:15px;padding:12px 14px;border-radius:12px;border:1px solid #cbd5f5;background:#eff6ff;text-align:left;}
-.device-btn:active{transform:scale(.98);}
-.device-btn.is-selected{border-color:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,.25);background:#e0f2fe;}
+.img-btn{margin-top:12px;width:100%;font-weight:700;background:#f8fcff;border:2px solid #38bdf8;}
+.img-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20000;display:none;}
+.img-modal{position:fixed;inset:0;z-index:20001;display:none;align-items:center;justify-content:center;padding:14px;}
+.img-card{width:min(980px,100%);height:min(90vh,100%);background:#fff;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 40px rgba(15,23,42,.35);}
+.img-card-header{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;}
+.img-card-title{font-weight:800;}
+.img-close{background:#eff6ff;border:1px solid #cbd5f5;border-radius:12px;padding:8px 12px;font-size:14px;}
+.img-view{flex:1;display:flex;align-items:center;justify-content:center;background:#0b1220;}
+.img-view img{max-width:100%;max-height:100%;object-fit:contain;}
 
 
-/* === Implant Device Modal (emergency-style sheet) === */
+/* === Shared sheet styles (same as implant device) === */
 .fab-dev{position:fixed;left:16px;bottom:16px;z-index:10000;
 background:#f8fcff;border:2px solid #38bdf8;color:#0f172a;
 border-radius:14px;padding:12px 14px;font-weight:800}
@@ -46,8 +48,6 @@ display:none;padding:12px 12px 18px}
 border-radius:20px;padding:12px 12px 14px;box-shadow:0 18px 40px rgba(15,23,42,.25)}
 .dev-list{display:flex;flex-direction:column;gap:10px;max-height:52vh;overflow:auto;padding:4px}
 .dev-item{border:1px solid #e2e8f0;border-radius:16px;padding:12px 12px;background:#ffffff}
-.dev-item:active{transform:scale(.99)}
-.dev-item.is-active{border-color:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,.18)}
 .dev-jp{font-weight:800;font-size:16px;line-height:1.25}
 .dev-en{font-size:13px;color:#475569;margin-top:4px;line-height:1.25}
 .dev-audio{margin-top:12px}
@@ -55,15 +55,13 @@ border-radius:20px;padding:12px 12px 14px;box-shadow:0 18px 40px rgba(15,23,42,.
 .dev-close{background:#eff6ff;border:1px solid #cbd5f5;border-radius:14px;padding:10px 14px;font-size:15px}
 .dev-title{font-size:12px;color:#64748b;margin:0 0 8px 6px}
 
-
-/* Nitro Image Sheet */
-.img-thumb-btn{
-  margin-top:12px;
+/* Nitro image in sheet */
+.nitro-img{
   width:100%;
-  font-weight:700;
-  background:#f8fcff;
-  border:2px solid #38bdf8;
+  max-height:55vh;
+  object-fit:contain;
   border-radius:14px;
+  background:#0b1220;
 }
 
 </style>
@@ -71,7 +69,7 @@ border-radius:20px;padding:12px 12px 14px;box-shadow:0 18px 40px rgba(15,23,42,.
 <body>
 <div class="header">
   <div class="frame-title">
-    <h1>患者入室（Patient Entry）</h1>
+    <h1>ニトロペン舌下投与</h1>
     <p>English Audio Guide</p>
   </div>
 </div>
@@ -98,7 +96,7 @@ border-radius:20px;padding:12px 12px 14px;box-shadow:0 18px 40px rgba(15,23,42,.
   </div>
 
   <div class="controls" style="margin-top:12px;">
-    <button class="img-thumb-btn" id="nitroImgOpen">🖼 ニトロペン投与イメージ図</button>
+    <button class="img-btn" id="openNitroImage" type="button">🖼 ニトロペン投与イメージ図</button>
   </div>
 
   <div class="status" id="status">待機中 / Ready</div>
@@ -111,23 +109,16 @@ border-radius:20px;padding:12px 12px 14px;box-shadow:0 18px 40px rgba(15,23,42,.
 
 <script>
 const STEPS = [
- {preview:"本日の通訳はすでに退勤しています…", jp:"本日の通訳はすでに退勤していますので、英語のガイドを使って説明します。", en:"Our interpreter has already left for the day, so I'll explain using an English guide."},
- {preview:"分からないことがあれば…", jp:"分からないことがあれば、いつでも言ってください。", en:"Please let me know if anything is unclear."},
- {preview:"生年月日を教えてください…", jp:"生年月日を教えていただけますか？", en:"Could you tell me your date of birth?"},
- {preview:"心臓デバイスの確認…", jp:"胸にペースメーカー、ICD、CRTなどの心臓デバイスは入っていますか？", en:"Do you have any heart devices in your chest, like a pacemaker, ICD, or CRT?"},
- {preview:"ベッドに座ってください…", jp:"ベッドに座って、靴を脱いでください。", en:"Please sit on the bed and take off your shoes."},
- {preview:"仰向けに寝てください…", jp:"ベッドに仰向けで寝てください。", en:"Please lie on your back on the bed."},
- {preview:"頭と足の位置…", jp:"頭はここ、足はあちらです。", en:"Your head goes here, and your feet go there."},
- {preview:"立ち上がって座る…", jp:"ゆっくり立ち上がって、ベッドに座ってください。", en:"Please stand up slowly and sit on the bed."},
- {preview:"スライドボード…", jp:"背中の後ろにスライドボードを入れますね。", en:"I'll put a slide board behind your back."},
- {preview:"ベッドへ移動…", jp:"これからベッドに移りますね。", en:"Let me slide you onto the bed now."},
- {preview:"少し上に…", jp:"少し上にずれてください。", en:"Please slide up a little."},
- {preview:"少し下に…", jp:"少し下にずれてください。", en:"Please slide down a little."},
- {preview:"上に移動…", jp:"少し上に移動しますね。", en:"I'll slide you up a little."},
- {preview:"下に移動…", jp:"少し下に移動しますね。", en:"I'll slide you down a little."},
- {preview:"首は大丈夫？", jp:"首はつらくないですか？", en:"Is your neck comfortable?"},
- {preview:"高さの確認…", jp:"高すぎたり低すぎたりしませんか？", en:"Is it not too high or low?"},
- {preview:"ベッドが動きます…", jp:"ベッドが動きますので、動かないでください。", en:"The bed will move now, so please stay still."}
+ {preview:"舌の下にお薬を入れます…", jp:"これからお薬を舌の下に入れます。心臓の血管を広げるお薬です。", en:"We’re going to put a medicine under your tongue. It helps widen the blood vessels in your heart."},
+ {preview:"舌下錠の説明…", jp:"これは舌下錠です。舌の下で溶けるので、飲み込まないでください。", en:"This is a sublingual tablet that dissolves under your tongue, so please don’t swallow it."},
+ {preview:"溶けにくい場合…", jp:"溶けにくい場合は、飴のようになめても構いませんが、噛まないでください。", en:"If it’s hard to dissolve, you can lick it like a candy to help it dissolved, but please don’t chew or bite it."},
+ {preview:"頭痛について…", jp:"このお薬は脳の血管も広げるため、軽い頭痛を感じることがありますが、心配いりません。", en:"This medicine can also widen the blood vessels in your brain, so you may feel a light headache, but it’s nothing to worry about."},
+ {preview:"頭痛が強い場合…", jp:"多くの方は軽い頭痛ですが、強くなった場合はすぐにお知らせください。", en:"Most patients feel just a mild headache, but if you feel the headache is getting worse, please tell us right away."},
+ {preview:"舌を上げて…", jp:"お口を開けて、舌を上げてください。", en:"Please open your mouth and lift your tongue."},
+ {preview:"飲み込まないで…", jp:"錠剤は飲み込まないでください。", en:"Please don’t swallow the tablet."},
+ {preview:"舌の上で溶かす…", jp:"飴のように舌の上で溶かしてください。", en:"Let it dissolve like a candy on your tongue."},
+ {preview:"溶けたら教えて…", jp:"お薬が溶けたら教えてください。", en:"Please let me know when the medicine has dissolved."},
+ {preview:"溶けましたか？…", jp:"溶けましたか？まだ舌の下にありますか？", en:"Has it dissolved? Is it still there under your tongue?"}
 ];
 
 const sel=document.getElementById('sel'),
@@ -162,91 +153,57 @@ player.onplay=()=>status.textContent="再生中 / Playing";
 player.onpause=()=>status.textContent="一時停止 / Paused";
 player.onended=()=>status.textContent="待機中 / Ready";
 
-
 load(0);
 
 
-document.addEventListener('DOMContentLoaded',()=>{
-  const DEV=[
-    {jp:'PM、CRT-P ありの場合：では検査後に心臓の機器を確認して、正常に作動しているか確認しますね。',
-     en:"Okay, we’ll check your heart device after the test to confirm everything is functioning properly.",
-     a:'audio/device_01_pm_crtp.m4a'},
-    {jp:'ICD、CRT-D ありの場合：では検査の前後に心臓の機器を確認して、正常に作動しているか確認しますね。',
-     en:"Okay, we’ll check your heart device before and after the test to confirm everything is functioning properly.",
-     a:'audio/device_02_icd_crtd.m4a'},
-    {jp:'今から心臓の機器のチェックをしますね。担当者が来るまで少しお待ちください。',
-     en:"We’ll check your heart device now. Please wait here for a moment until the staff arrives.",
-     a:'audio/device_03_wait_for_staff.m4a'}
-  ];
+// Nitro image sheet (same behavior as implant device)
+const nitroImgFab = document.getElementById('nitroImgFab');
+const nitroImgBackdrop = document.getElementById('nitroImgBackdrop');
+const nitroImgSheet = document.getElementById('nitroImgSheet');
+const nitroImgClose = document.getElementById('nitroImgClose');
 
-  const open=document.getElementById('devOpen');
-  const back=document.getElementById('devBackdrop');
-  const sheet=document.getElementById('devSheet');
-  const list=document.getElementById('devList');
-  const player=document.getElementById('devPlayer');
-  const close=document.getElementById('devClose');
+function showNitroImg(){
+  if(!nitroImgBackdrop || !nitroImgSheet) return;
+  nitroImgBackdrop.style.display='block';
+  nitroImgSheet.style.display='block';
+  if(nitroImgFab) nitroImgFab.style.display='none';
+}
+function hideNitroImg(){
+  if(!nitroImgBackdrop || !nitroImgSheet) return;
+  nitroImgBackdrop.style.display='none';
+  nitroImgSheet.style.display='none';
+  if(nitroImgFab) nitroImgFab.style.display='';
+}
 
-  if(!open || !back || !sheet || !list || !player || !close) return;
-
-  const show=()=>{back.style.display='block';sheet.style.display='block';open.style.display='none';};
-  const hide=()=>{back.style.display='none';sheet.style.display='none';open.style.display='';};
-
-  DEV.forEach((s,i)=>{
-    const d=document.createElement('div');
-    d.className='dev-item';
-    d.innerHTML=`<div class="dev-jp">${i+1}. ${s.jp}</div>
-                 <div class="dev-en">${s.en}</div>`;
-    d.addEventListener('click',()=>{
-      list.querySelectorAll('.dev-item').forEach(x=>x.classList.remove('is-active'));
-      d.classList.add('is-active');
-      player.src=s.a;
-      player.play();
-    });
-    list.appendChild(d);
-  });
-
-  open.addEventListener('click', show);
-  close.addEventListener('click', hide);
-  back.addEventListener('click', hide);
-
-  document.addEventListener('keydown',(e)=>{
-    if(e.key==='Escape') hide();
-  });
-});
+if(nitroImgFab) nitroImgFab.addEventListener('click', showNitroImg);
+if(nitroImgClose) nitroImgClose.addEventListener('click', hideNitroImg);
+if(nitroImgBackdrop) nitroImgBackdrop.addEventListener('click', hideNitroImg);
+document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') hideNitroImg(); });
 
 </script>
 
-<button class="fab-dev" id="devOpen">植え込みデバイスがある場合</button>
-<div class="dev-backdrop" id="devBackdrop"></div>
-<div class="dev-sheet" id="devSheet" role="dialog" aria-modal="true" aria-label="implant device">
-  <div class="dev-panel">
-    <div class="dev-title">植え込みデバイスがある場合 / If you have an implanted heart device</div>
-    <div class="dev-list" id="devList"></div>
-
-    <div class="dev-audio">
-      <audio id="devPlayer" controls style="width:100%"></audio>
+<button class="img-close" id="closeNitroImage" type="button">閉じる</button>
     </div>
-
-    <div class="dev-footer">
-      <button class="dev-close" id="devClose" type="button">閉じる</button>
-      <div style="font-size:12px;color:#64748b;">タップで再生 / Tap to play</div>
+    <div class="img-view">
+      <img src="img/nitropen_image.jpg" alt="ニトロペン投与イメージ図">
     </div>
   </div>
 </div>
 
+<button class="fab-dev" id="nitroImgFab">ニトロペン投与イメージ図</button>
 
 <div class="dev-backdrop" id="nitroImgBackdrop"></div>
-<div class="dev-sheet" id="nitroImgSheet" role="dialog" aria-modal="true">
+<div class="dev-sheet" id="nitroImgSheet" role="dialog" aria-modal="true" aria-label="nitro image">
   <div class="dev-panel">
     <div class="dev-title">ニトロペン投与イメージ図</div>
+
     <div style="padding:6px;">
-      <img src="img/nitropen_image.jpg"
-           alt="ニトロペン投与イメージ図"
-           style="width:100%;max-height:55vh;object-fit:contain;border-radius:14px;background:#0b1220;">
+      <img class="nitro-img" src="img/nitropen_image.jpg" alt="ニトロペン投与イメージ図">
     </div>
+
     <div class="dev-footer">
-      <button class="dev-close" id="nitroImgClose">閉じる</button>
-      <div style="font-size:12px;color:#64748b;">舌の下に入れます</div>
+      <button class="dev-close" id="nitroImgClose" type="button">閉じる</button>
+      <div style="font-size:12px;color:#64748b;">タップして確認できます</div>
     </div>
   </div>
 </div>
